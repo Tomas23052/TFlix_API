@@ -7,7 +7,7 @@ import axios from 'axios';
 import {Modal, ModalBody, ModalFooter, ModalHeader} from 'reactstrap';
 import logoFilmes from './iconFilmes.png'
 
-function Filmes() {
+function App() {
 
 const baseURL ="https://localhost:7198/API/FilmesAPI";
 
@@ -46,14 +46,10 @@ const abrirFecharModalExcluir=()=>{
 
 const abrirFecharModalCriado=()=>{
   setModalCriado(!modalCriado);
-  document.body.style.overflow = "visible";
-  document.body.style.paddingRight = "0px";
 }
 
 const abrirFecharModalEditado=()=>{
-  setModalEditado(!modalEditado);
-  document.body.style.overflow = "visible";
-  document.body.style.paddingRight = "0px";
+  setModalEditado(!modalEditado)
 }
 
 const handleChange = e=>{
@@ -156,9 +152,6 @@ useEffect(()=>{
     <div className="filmes_container">
       <br/>
       <h3>Filmes</h3>
-      <Link className='button' to ="/">
-        <button type="button" className='btn btn-outline-info btn-sm'>Voltar</button>
-      </Link>
       <header className="App-header">
         <img src={logoFilmes} alt="Logo"/>
         <button onClick={()=> abrirFecharModalAdicionar()} className='btn btn-success'>Adicionar um Filme</button>
@@ -306,4 +299,4 @@ useEffect(()=>{
   );
 }
 
-export default Filmes;
+export default App;

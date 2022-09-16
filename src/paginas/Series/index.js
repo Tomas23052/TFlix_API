@@ -5,11 +5,11 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import {Modal, ModalBody, ModalFooter, ModalHeader} from 'reactstrap';
-import logoFilmes from './iconFilmes.png'
+import logoSeries from './iconSeries.png'
 
-function Filmes() {
+function Series() {
 
-const baseURL ="https://localhost:7198/API/FilmesAPI";
+const baseURL ="https://localhost:7198/API/SeriesAPI";
 
 const [data, setData]=useState([]);
 const [updateData, setUpdateData]=useState(true);
@@ -19,9 +19,10 @@ const [modalExcluir, setModalExcluir]=useState(false);
 const [modalCriado, setModalCriado]=useState(false);
 const [modalEditado, setModalEditado]=useState(false);
 
-const [filmeSelecionado, setFilmeSelecionado] = useState(
+const [serieSelecionada, setSerieSelecionada] = useState(
   {
     id : '',
+    nome : '',
     titulo: '',
     imagem: null,
     sinopse: '',
@@ -29,6 +30,8 @@ const [filmeSelecionado, setFilmeSelecionado] = useState(
     classificacao: '',
     elenco: '',
     genero: '',
+    temporada: '',
+    episodio: '',
   }
 )
 
@@ -58,17 +61,17 @@ const abrirFecharModalEditado=()=>{
 
 const handleChange = e=>{
   const {name, value} = e.target;
-  setFilmeSelecionado({
-    ...filmeSelecionado,[name]:value
+  setSerieSelecionada({
+    ...serieSelecionada,[name]:value
   });
-  console.log(filmeSelecionado);
+  console.log(serieSelecionada);
 }
 
 const handleImagemChange = (e) => {
-  setFilmeSelecionado({
-    ...filmeSelecionado, imagem: e.target.files[0]
+  setSerieSelecionada({
+    ...serieSelecionada, imagem: e.target.files[0]
   });
-  console.log(filmeSelecionado);
+  console.log(serieSelecionada);
 }
 
 const pedidoGet = async()=>{
@@ -81,24 +84,29 @@ const pedidoGet = async()=>{
 
 }
 
-const selecionarFilme=(filme,opcao)=>{
-  setFilmeSelecionado(filme);
+const selecionarSerie=(serie,opcao)=>{
+  setSerieSelecionada(serie);
     (opcao ==="Editar") ?
       abrirFecharModalEditar(): abrirFecharModalExcluir();
 }
 
 const pedidoPost = async () => {
-  delete filmeSelecionado.id;
+  delete serieSelecionada.id;
   const formData = new FormData();
-  formData.append("titulo", filmeSelecionado.titulo)
-  formData.append("imagem", filmeSelecionado.imagem)
-  formData.append("sinopse", filmeSelecionado.sinopse)
-  formData.append("dataLancamento", filmeSelecionado.dataLancamento)
-  formData.append("classificacao", filmeSelecionado.classificacao)
-  formData.append("elenco", filmeSelecionado.elenco)
-  formData.append("genero", filmeSelecionado.genero)
-  axios.post(baseURL, formData)
-  .then(response => {
+  formData.append("titulo", serieSelecionada.titulo)
+  formData.append("imagem", serieSelecionada.imagem)
+  formData.append("sinopse", serieSelecionada.sinopse)
+  formData.append("dataLancamento", serieSelecionada.dataLancamento)
+  formData.append("classificacao", serieSelecionada.classificacao)
+  formData.append("elenco", serieSelecionada.elenco)
+  formData.append("genero", serieSelecionada.genero)
+  formData.append("temporada", serieSelecionada.temporada)
+  formData.append("episodio", serieSelecionada.episodio)
+  axios.post(baseURL, formData, {
+    headers: {
+      'Content-Type' : 'multipart/form-data'
+    }
+  }).then(response => {
     setData(data.concat(response.data));
     setUpdateData(true);
     abrirFecharModalAdicionar();
@@ -109,20 +117,22 @@ const pedidoPost = async () => {
 }
 
 const pedidoPut= async() => {
-  await axios.put(baseURL + "/" + filmeSelecionado.id, filmeSelecionado)
+  await axios.put(baseURL + "/" + serieSelecionada.id, serieSelecionada)
   .then(response=>{
     var resposta = response.data;
     var dadosAuxiliar = data;
-    console.log(filmeSelecionado.id)
-    dadosAuxiliar.map((filme) => {
-      if (filme.id === filmeSelecionado.id) {
-        filme.titulo = resposta.titulo;
-        filme.imagem = resposta.imagem;
-        filme.sinopse = resposta.sinopse;
-        filme.dataLancamento = resposta.dataLancamento;
-        filme.classificacao = resposta.classificacao;
-        filme.elenco = resposta.elenco;
-        filme.genero = resposta.genero;
+    console.log(serieSelecionada.id)
+    dadosAuxiliar.map((serie) => {
+      if (serie.id === serieSelecionada.id) {
+        serie.titulo = resposta.titulo;
+        serie.imagem = resposta.imagem;
+        serie.sinopse = resposta.sinopse;
+        serie.dataLancamento = resposta.dataLancamento;
+        serie.classificacao = resposta.classificacao;
+        serie.elenco = resposta.elenco;
+        serie.genero = resposta.genero;
+        serie.temporada = resposta.temporada;
+        serie.episodio = resposta.episodio;
       }
     });
     setUpdateData(true);
@@ -134,9 +144,9 @@ const pedidoPut= async() => {
 }
 
 const pedidoDelete=async()=>{
-  await axios.delete(baseURL+"/"+filmeSelecionado.id)
+  await axios.delete(baseURL+"/"+serieSelecionada.id)
   .then(response=>{
-    setData(data.filter(filme=>filme.id !== response.data));
+    setData(data.filter(serie=>serie.id !== response.data));
     setUpdateData(true);
     abrirFecharModalExcluir();
   }).catch(error=>{
@@ -153,15 +163,15 @@ useEffect(()=>{
 }, [updateData])
 
   return (
-    <div className="filmes_container">
+    <div className="series_container">
       <br/>
-      <h3>Filmes</h3>
-      <Link className='button' to ="/">
+      <Link className='button' to="/">
         <button type="button" className='btn btn-outline-info btn-sm'>Voltar</button>
       </Link>
+      <h3>Series</h3>
       <header className="App-header">
-        <img src={logoFilmes} alt="Logo"/>
-        <button onClick={()=> abrirFecharModalAdicionar()} className='btn btn-success'>Adicionar um Filme</button>
+        <img src={logoSeries} alt="Logo"/>
+        <button onClick={()=> abrirFecharModalAdicionar()} className='btn btn-success'>Adicionar uma Série</button>
       </header>
       <table className='table table-dark table-striped mt-4'>
         <thead>
@@ -174,34 +184,38 @@ useEffect(()=>{
             <th>Classificação</th>
             <th>Elenco</th>
             <th>Género</th>
+            <th>Nº Temporadas</th>
+            <th>Nº Episódios</th>
             <th>Operação</th>
           </tr>
         </thead>
         <tbody>
-          {data.map(filme=>(
-            <tr key={filme.id}>
-              <td>{filme.id}</td>
-              <td>{filme.titulo}</td>
-              <td><img src={'https://localhost:7198/Fotos/Filmes/' + filme.imagem}
-                alt={'Imagem de ' + filme.titulo}
-                title={filme.titulo}
+          {data.map(serie=>(
+            <tr key={serie.id}>
+              <td>{serie.id}</td>
+              <td>{serie.titulo}</td>
+              <td><img src={'https://localhost:7198/Fotos/Series/' + serie.imagem}
+                alt={'Imagem de ' + serie.titulo}
+                title={serie.titulo}
                 height="100"/>
                 </td>
-              <td className="sinopse">{filme.sinopse}</td>
-              <td>{filme.dataLancamento}</td>
-              <td>{filme.classificacao}</td>
-              <td>{filme.elenco}</td>
-              <td>{filme.genero}</td>
+              <td className="sinopse">{serie.sinopse}</td>
+              <td>{serie.dataLancamento}</td>
+              <td>{serie.classificacao}</td>
+              <td>{serie.elenco}</td>
+              <td>{serie.genero}</td>
+              <td>{serie.temporada}</td>
+              <td>{serie.episodio}</td>
               <td>
-                <button className="btn btn-primary" onClick={()=>selecionarFilme(filme,"Editar")}>Editar</button> {"  "}
-                <button className="btn btn-danger" onClick={()=>selecionarFilme(filme,"Excluir")}>Excluir</button>
+                <button className="btn btn-primary" onClick={()=>selecionarSerie(serie,"Editar")}>Editar</button> {"  "}
+                <button className="btn btn-danger" onClick={()=>selecionarSerie(serie,"Excluir")}>Excluir</button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
       <Modal isOpen={modalAdicionar}>
-      <ModalHeader>Adicionar Filme</ModalHeader>
+      <ModalHeader>Adicionar Série</ModalHeader>
       <ModalBody>
        <div className='form-group'>
           <label>Título:</label>
@@ -226,6 +240,12 @@ useEffect(()=>{
           <br />
           <input type="text" className='form-control' name="genero" onChange={handleChange}/>
           <br />
+          <label>Nº Temporadas:</label>
+          <br />
+          <input type="number" className='form-control' name="temporada" onChange={handleChange}/>
+          <label>Nº Episódios:</label>
+          <br />
+          <input type="number" className='form-control' name="episodio" onChange={handleChange}/>
        </div> 
       </ModalBody>
       <ModalFooter>
@@ -235,38 +255,38 @@ useEffect(()=>{
       </Modal>
       
       <Modal isOpen={modalEditar}>
-        <ModalHeader>Editar Filme</ModalHeader>
+        <ModalHeader>Editar Série</ModalHeader>
         <ModalBody>
           <div className="form-group">
           <label>ID:</label> <br />
-          <input type="text" className="form-control" readOnly value={filmeSelecionado && filmeSelecionado.id}/><br />
+          <input type="text" className="form-control" readOnly value={serieSelecionada && serieSelecionada.id}/><br />
           <label>Título:</label>
           <br />
           <input type="text" className='form-control' name="titulo" onChange={handleChange}
-            value={filmeSelecionado && filmeSelecionado.titulo}/>
+            value={serieSelecionada && serieSelecionada.titulo}/>
           <label>Imagem:</label>
           <br />
           <input type="file" className='form-control' name="imagem" accept=".jpg,.png,.jpeg" onChange={handleImagemChange}/>
           <label>Sinopse:</label>
           <br />
           <input type="text" className='form-control' name="sinopse" onChange={handleChange}
-            value={filmeSelecionado && filmeSelecionado.sinopse}/>
+            value={serieSelecionada && serieSelecionada.sinopse}/>
           <label>Data de Lançamento:</label>
           <br />
           <input type="date" className='form-control' name="dataLancamento" onChange={handleChange}
-            value={filmeSelecionado && filmeSelecionado.dataLancamento}/>
+            value={serieSelecionada && serieSelecionada.dataLancamento}/>
           <label>Classificação:</label>
           <br />
           <input type="number" className='form-control' name="classificacao" onChange={handleChange}
-            value={filmeSelecionado && filmeSelecionado.classificacao}/>
+            value={serieSelecionada && serieSelecionada.classificacao}/>
           <label>Elenco:</label>
           <br />
           <input type="text" className='form-control' name="elenco" onChange={handleChange}
-            value={filmeSelecionado && filmeSelecionado.elenco}/>
+            value={serieSelecionada && serieSelecionada.elenco}/>
           <label>Género:</label>
           <br />
           <input type="text" className='form-control' name="genero" onChange={handleChange}
-            value={filmeSelecionado && filmeSelecionado.genero}/>
+            value={serieSelecionada && serieSelecionada.genero}/>
           <br />
           </div>
         </ModalBody>
@@ -278,7 +298,7 @@ useEffect(()=>{
 
       <Modal isOpen={modalExcluir}>
         <ModalBody>
-          Confirma a exclusão deste filme : {filmeSelecionado && filmeSelecionado.titulo} ? 
+          Confirma a exclusão deste Série : {serieSelecionada && serieSelecionada.titulo} ? 
         </ModalBody>
         <ModalFooter>
           <button className='btn btn-danger' onClick={()=>pedidoDelete()}> Sim </button>
@@ -287,17 +307,17 @@ useEffect(()=>{
       </Modal>
 
       <Modal isOpen={modalCriado}>
-        <ModalHeader>Filme Adicionado</ModalHeader>
+        <ModalHeader>Série Adicionada</ModalHeader>
         <ModalBody>
-          <div>O filme que introduziu foi adicionado com sucesso!</div>
+          <div>A série que introduziu foi adicionado com sucesso!</div>
         </ModalBody>
         <ModalFooter className="btn btn-primary" onClick={()=>abrirFecharModalCriado()}></ModalFooter>
       </Modal>
 
       <Modal isOpen={modalEditado}>
-        <ModalHeader>Filme Editado</ModalHeader>
+        <ModalHeader>Série Editada</ModalHeader>
         <ModalBody>
-          <div>O filme foi editado com sucesso!</div>
+          <div>A série foi editado com sucesso!</div>
         </ModalBody>
         <ModalFooter className="btn btn-primary" onClick={()=>abrirFecharModalEditado()}></ModalFooter>
       </Modal>
@@ -306,4 +326,4 @@ useEffect(()=>{
   );
 }
 
-export default Filmes;
+export default Series;

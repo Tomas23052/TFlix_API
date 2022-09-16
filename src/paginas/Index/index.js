@@ -11,7 +11,7 @@ function Index() {
       <header className="App-header">
         <img src={logo1} className="App-logo" alt="logo" />
         <p>
-          <img src={logo2} className="App-logo2" />
+          <img src={logo2} className="App-logo2" alt="logo2" />
         </p>
         <Link className="button" to="Utilizadores">
           <button type="button" className="btn btn-outline-light btn-lg">Utilizadores</button>
