@@ -6,6 +6,7 @@ import Series from "./paginas/Series";
 import Filmes from "./paginas/Filmes";
 import Alugueres from "./paginas/Alugueres";
 import Utilizadores from "./paginas/Utilizadores";
+import Subscricao from "./paginas/Subscricao";
 
 
 
@@ -19,7 +20,7 @@ function Rotas(){
                 <Route path="/Series" element={<Series/>}/>
                 <Route path="/Alugueres" element={<Alugueres/>}/>
                 <Route path="/Utilizadores" element={<Utilizadores/>}/>
-                
+                <Route path="/Subscricao" element={<Subscricao/>}/>
                 
             </Routes>
         </BrowserRouter>

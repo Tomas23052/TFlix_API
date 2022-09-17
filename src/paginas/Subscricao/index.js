@@ -5,30 +5,40 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import {Modal, ModalBody, ModalFooter, ModalHeader} from 'reactstrap';
-import logoFilmes from './iconFilmes.png'
+import logoSubs from './iconSubs.png'
 
-function App() {
+function Subscricao() {
 
-const baseURL ="https://localhost:7198/API/FilmesAPI";
+const baseURL ="https://localhost:7198/API/SubscricaoesAPI";
+const baseURL1 ="https://localhost:7198/API/UtilizadoresAPI";
+const baseURL2 ="https://localhost:7198/API/FilmesAPI";
+const baseURL3 ="https://localhost:7198/API/SeriesAPI";
 
 const [data, setData]=useState([]);
+const [data1, setData1]=useState([]);
+const [data2, setData2]=useState([]);
+const [data3, setData3]=useState([]);
 const [updateData, setUpdateData]=useState(true);
+const [updateData1, setUpdateData1]=useState(true);
+const [updateData2, setUpdateData2]=useState(true);
+const [updateData3, setUpdateData3]=useState(true);
 const [modalAdicionar, setModalAdicionar]=useState(false);
 const [modalEditar, setModalEditar]=useState(false);
 const [modalExcluir, setModalExcluir]=useState(false);
 const [modalCriado, setModalCriado]=useState(false);
 const [modalEditado, setModalEditado]=useState(false);
 
-const [filmeSelecionado, setFilmeSelecionado] = useState(
+const [subscricaoSelecionada, setSubscricaoSelecionada] = useState(
   {
-    id : '',
-    titulo: '',
-    imagem: null,
-    sinopse: '',
-    dataLancamento: '',
-    classificacao: '',
-    elenco: '',
-    genero: '',
+    id: '',
+    utilizador: '',
+    duracao: null,
+    preco: null,
+    auxPreco: null,
+    dataInicio: null,
+    dataFim: null,
+    filmes: '',
+    series: '',
   }
 )
 
@@ -52,73 +62,116 @@ const abrirFecharModalEditado=()=>{
   setModalEditado(!modalEditado)
 }
 
-const handleChange = e=>{
-  const {name, value} = e.target;
-  setFilmeSelecionado({
-    ...filmeSelecionado,[name]:value
+const handleUtilizadorChange = (e) => {
+  setSubscricaoSelecionada({
+      ...subscricaoSelecionada, utilizador: e.target.value
   });
-  console.log(filmeSelecionado);
+  console.log(subscricaoSelecionada);
 }
 
-const handleImagemChange = (e) => {
-  setFilmeSelecionado({
-    ...filmeSelecionado, imagem: e.target.files[0]
+const handleFilmeChange = (e) => {
+  setSubscricaoSelecionada({
+      ...subscricaoSelecionada, filmes: e.target.value
   });
-  console.log(filmeSelecionado);
+  console.log(subscricaoSelecionada);
 }
 
-const pedidoGet = async()=>{
+const handleSerieChange = (e) => {
+  setSubscricaoSelecionada({
+      ...subscricaoSelecionada, series: e.target.value
+  });
+  console.log(subscricaoSelecionada);
+}
+
+const handleAuxPrecoChange = (e) => {
+  setSubscricaoSelecionada({
+      ...subscricaoSelecionada, auxPreco: e.target.value
+  });
+  console.log(subscricaoSelecionada);
+}
+
+
+
+const pedidoGet = async () => {
   await axios.get(baseURL)
-  .then(response =>{
-    setData(response.data);
-  }).catch(error =>{
-    console.log(error);
-  })
-
+      .then(response => {
+          setData(response.data);
+          console.log(response.data)
+      }).catch(error => {
+          console.log(error);
+      })
 }
 
-const selecionarFilme=(filme,opcao)=>{
-  setFilmeSelecionado(filme);
-    (opcao ==="Editar") ?
-      abrirFecharModalEditar(): abrirFecharModalExcluir();
+const pedidoGet1 = async () => {
+  await axios.get(baseURL1)
+      .then(response => {
+          setData1(response.data);
+      }).catch(error => {
+          console.log(error);
+      })
+}
+
+
+const pedidoGet2 = async () => {
+  await axios.get(baseURL2)
+      .then(response => {
+          setData2(response.data);
+      }).catch(error => {
+          console.log(error);
+      })
+}
+
+const pedidoGet3 = async () => {
+  await axios.get(baseURL3)
+      .then(response => {
+          setData3(response.data);
+      }).catch(error => {
+          console.log(error);
+      })
+}
+
+const selecionarSubscricao = (subscricao, opcao) => {
+  setSubscricaoSelecionada(subscricao);
+  (opcao === "Editar") ?
+      abrirFecharModalEditar() : abrirFecharModalExcluir();
 }
 
 const pedidoPost = async () => {
-  delete filmeSelecionado.id;
+  delete subscricaoSelecionada.id;
   const formData = new FormData();
-  formData.append("titulo", filmeSelecionado.titulo)
-  formData.append("imagem", filmeSelecionado.imagem)
-  formData.append("sinopse", filmeSelecionado.sinopse)
-  formData.append("dataLancamento", filmeSelecionado.dataLancamento)
-  formData.append("classificacao", filmeSelecionado.classificacao)
-  formData.append("elenco", filmeSelecionado.elenco)
-  formData.append("genero", filmeSelecionado.genero)
-  axios.post(baseURL, formData)
-  .then(response => {
-    setData(data.concat(response.data));
-    setUpdateData(true);
-    abrirFecharModalAdicionar();
-    abrirFecharModalCriado();
+  formData.append("nomeUtilizador", subscricaoSelecionada.nomeUtilizador)
+  formData.append("nomeFilme", subscricaoSelecionada.nomeFilme)
+  formData.append("preco", subscricaoSelecionada.preco)
+  formData.append("auxPreco", subscricaoSelecionada.auxPreco)
+  formData.append("dataInicio", subscricaoSelecionada.dataInicio)
+  formData.append("dataFim", subscricaoSelecionada.dataFim)
+  axios.post(baseURL, formData, {
+      headers: {
+          'Content-Type': 'text/plain'
+      }
+  }).then(response => {
+      setData(data.concat(response.data));
+      setUpdateData(true);
+      abrirFecharModalAdicionar();
+      abrirFecharModalCriado();
   }).catch(error => {
-    console.log(error);
+      console.log(error);
   })
 }
 
 const pedidoPut= async() => {
-  await axios.put(baseURL + "/" + filmeSelecionado.id, filmeSelecionado)
+  await axios.put(baseURL + "/" + subscricaoSelecionada.id, subscricaoSelecionada)
   .then(response=>{
     var resposta = response.data;
     var dadosAuxiliar = data;
-    console.log(filmeSelecionado.id)
-    dadosAuxiliar.map((filme) => {
-      if (filme.id === filmeSelecionado.id) {
-        filme.titulo = resposta.titulo;
-        filme.imagem = resposta.imagem;
-        filme.sinopse = resposta.sinopse;
-        filme.dataLancamento = resposta.dataLancamento;
-        filme.classificacao = resposta.classificacao;
-        filme.elenco = resposta.elenco;
-        filme.genero = resposta.genero;
+    console.log(subscricaoSelecionada.id)
+    dadosAuxiliar.map((subscricao) => {
+      if (subscricao.id === subscricaoSelecionada.id) {
+        subscricao.nomeUtilizador = resposta.nomeUtilizador;
+        subscricao.nomeFilme = resposta.nomeFilme;
+        subscricao.preco = resposta.preco;
+        subscricao.dataInicio = resposta.dataInicio;
+        subscricao.dataFim = resposta.dataFim;
       }
     });
     setUpdateData(true);
@@ -130,9 +183,9 @@ const pedidoPut= async() => {
 }
 
 const pedidoDelete=async()=>{
-  await axios.delete(baseURL+"/"+filmeSelecionado.id)
+  await axios.delete(baseURL+"/"+ subscricaoSelecionada.id)
   .then(response=>{
-    setData(data.filter(filme=>filme.id !== response.data));
+    setData(data.filter(subscricao=>subscricao.id !== response.data));
     setUpdateData(true);
     abrirFecharModalExcluir();
   }).catch(error=>{
@@ -148,78 +201,114 @@ useEffect(()=>{
   
 }, [updateData])
 
+useEffect(()=>{
+  if(updateData1){
+    pedidoGet1();
+    setUpdateData1(false);
+  }
+  
+}, [updateData1])
+
+useEffect(()=>{
+  if(updateData2){
+    pedidoGet2();
+    setUpdateData2(false);
+  }
+  
+}, [updateData2])
+
+useEffect(()=>{
+  if(updateData3){
+    pedidoGet3();
+    setUpdateData3(false);
+  }
+  
+}, [updateData3])
+
   return (
-    <div className="filmes_container">
+    <div className="subscricoes_container">
       <br/>
       <h3>Filmes</h3>
+      <Link className="button" to="/">
+          <button type="button" className="btn btn-outline-info btn-sm">Voltar</button>
+      </Link>
       <header className="App-header">
-        <img src={logoFilmes} alt="Logo"/>
-        <button onClick={()=> abrirFecharModalAdicionar()} className='btn btn-success'>Adicionar um Filme</button>
+        <img src={logoSubs} alt="Logo"/>
+        <button onClick={()=> abrirFecharModalAdicionar()} className='btn btn-success'>Adicionar uma Subscrição</button>
       </header>
       <table className='table table-dark table-striped mt-4'>
         <thead>
           <tr>
-            <th>Id</th>
-            <th>Título</th>
-            <th>Imagem</th>
-            <th>Sinopse</th>
-            <th>Data de Lançamento</th>
-            <th>Classificação</th>
-            <th>Elenco</th>
-            <th>Género</th>
-            <th>Operação</th>
+           <th>Id</th>
+           <th>Utilizador</th>(
+           <th>Duração</th>
+           <th>Preço</th>
+           <th>Data de Início</th>
+           <th>Data de Fim</th>
+           <th>Filmes</th>
+           <th>Séries</th>
+           <th>Operação</th>
           </tr>
         </thead>
         <tbody>
-          {data.map(filme=>(
-            <tr key={filme.id}>
-              <td>{filme.id}</td>
-              <td>{filme.titulo}</td>
-              <td><img src={'https://localhost:7198/Fotos/Filmes/' + filme.imagem}
-                alt={'Imagem de ' + filme.titulo}
-                title={filme.titulo}
-                height="100"/>
+        {data.map((subscricao, i) => (
+            <tr key={subscricao}>
+                <td>{subscricao.id}</td>
+                <td>{subscricao.utilizador.nome}</td>
+                <td>{subscricao.duracao}</td>
+                <td>{subscricao.preco}</td>
+                <td>{subscricao.dataInicio}</td>
+                <td>{subscricao.dataFim}</td>
+                <td>{subscricao.filmes[i].titulo}</td>
+                <td>{subscricao.series[i].titulo}<br />
+                    {subscricao.series[i + 1].titulo}
                 </td>
-              <td className="sinopse">{filme.sinopse}</td>
-              <td>{filme.dataLancamento}</td>
-              <td>{filme.classificacao}</td>
-              <td>{filme.elenco}</td>
-              <td>{filme.genero}</td>
-              <td>
-                <button className="btn btn-primary" onClick={()=>selecionarFilme(filme,"Editar")}>Editar</button> {"  "}
-                <button className="btn btn-danger" onClick={()=>selecionarFilme(filme,"Excluir")}>Excluir</button>
-              </td>
+                <td>
+                    <button className="btn btn-primary" onClick={() => selecionarSubscricao(subscricao, "Editar")}></button> {"   "}
+                    <button className="btn btn-danger" onClick={() => selecionarSubscricao(subscricao, "Excluir")}></button>
+                </td>
             </tr>
-          ))}
+        ))}
         </tbody>
       </table>
       <Modal isOpen={modalAdicionar}>
-      <ModalHeader>Adicionar Filme</ModalHeader>
+      <ModalHeader>Adicionar Subscrição</ModalHeader>
       <ModalBody>
-       <div className='form-group'>
-          <label>Título:</label>
+      <div className="form-group">
+          <label>Utilizador:</label>
           <br />
-          <input type="text" className='form-control' name="titulo" onChange={handleChange}/>
-          <label>Imagem:</label>
+          <select className="form-select" onChange={handleUtilizadorChange}>
+              <option value="">Escolha um utilizador</option>
+              {data1.map(utilizador => (
+                  <option key={utilizador.id} value={utilizador.id}>{utilizador.nome}</option>
+              ))}
+          </select>
           <br />
-          <input type="file" className='form-control' name="imagem" accept=".jpg,.png,.jpeg" onChange={handleImagemChange}/>
-          <label>Sinopse:</label>
+          <label>Filme:</label>
+          <select className="form-select" onChange={handleFilmeChange}>
+              <option value="">Escolha um flme</option>
+              {data2.map(filme => (
+                  <option key={filme.id} value={filme.id} >{filme.titulo}</option>
+              ))}
+          </select>
           <br />
-          <input type="text" className='form-control' name="sinopse" onChange={handleChange}/>
-          <label>Data de Lançamento:</label>
+          <label>Série:</label>
+          <select className="form-select" onChange={handleSerieChange}>
+              <option value="">Escolha uma série</option>
+              {data3.map(serie => (
+                  <option key={serie.id} value={serie.id} >{serie.titulo}</option>
+              ))}
+          </select>
           <br />
-          <input type="date" className='form-control' name="dataLancamento" onChange={handleChange}/>
-          <label>Classificação:</label>
+          <label>Preço:</label>
           <br />
-          <input type="number" className='form-control' name="classificacao" onChange={handleChange}/>
-          <label>Elenco:</label>
-          <br />
-          <input type="text" className='form-control' name="elenco" onChange={handleChange}/>
-          <label>Género:</label>
-          <br />
-          <input type="text" className='form-control' name="genero" onChange={handleChange}/>
-          <br />
-       </div> 
+          <select className="form-control" onChange={handleAuxPrecoChange}>
+              <option value="">Escolha uma opção</option>
+              <option value="10.99">10,99 por 1 mês</option>
+              <option value="39.99">39,99 por 6 meses</option>
+              <option value="69.99">69,99 por 12 meses</option>
+          </select>
+      </div>
       </ModalBody>
       <ModalFooter>
         <button className="btn btn-primary" onClick={()=>pedidoPost()}>Adicionar</button> {"   "}
@@ -228,40 +317,43 @@ useEffect(()=>{
       </Modal>
       
       <Modal isOpen={modalEditar}>
-        <ModalHeader>Editar Filme</ModalHeader>
+        <ModalHeader>Editar Subscrição</ModalHeader>
         <ModalBody>
-          <div className="form-group">
-          <label>ID:</label> <br />
-          <input type="text" className="form-control" readOnly value={filmeSelecionado && filmeSelecionado.id}/><br />
-          <label>Título:</label>
+        <div className="form-group">
+          <label>Utilizador:</label>
           <br />
-          <input type="text" className='form-control' name="titulo" onChange={handleChange}
-            value={filmeSelecionado && filmeSelecionado.titulo}/>
-          <label>Imagem:</label>
+          <select className="form-select" onChange={handleUtilizadorChange}>
+              <option value="">Escolha um utilizador</option>
+              {data1.map(utilizador => (
+                  <option key={utilizador.id} value={utilizador.id}>{utilizador.nome}</option>
+              ))}
+          </select>
           <br />
-          <input type="file" className='form-control' name="imagem" accept=".jpg,.png,.jpeg" onChange={handleImagemChange}/>
-          <label>Sinopse:</label>
+          <label>Filme:</label>
+          <select className="form-select" onChange={handleFilmeChange}>
+              <option value="">Escolha um flme</option>
+              {data2.map(filme => (
+                  <option key={filme.id} value={filme.id} >{filme.titulo}</option>
+              ))}
+          </select>
           <br />
-          <input type="text" className='form-control' name="sinopse" onChange={handleChange}
-            value={filmeSelecionado && filmeSelecionado.sinopse}/>
-          <label>Data de Lançamento:</label>
+          <label>Série:</label>
+          <select className="form-select" onChange={handleSerieChange}>
+              <option value="">Escolha uma série</option>
+              {data3.map(serie => (
+                  <option key={serie.id} value={serie.id} >{serie.titulo}</option>
+              ))}
+          </select>
           <br />
-          <input type="date" className='form-control' name="dataLancamento" onChange={handleChange}
-            value={filmeSelecionado && filmeSelecionado.dataLancamento}/>
-          <label>Classificação:</label>
+          <label>Preço:</label>
           <br />
-          <input type="number" className='form-control' name="classificacao" onChange={handleChange}
-            value={filmeSelecionado && filmeSelecionado.classificacao}/>
-          <label>Elenco:</label>
-          <br />
-          <input type="text" className='form-control' name="elenco" onChange={handleChange}
-            value={filmeSelecionado && filmeSelecionado.elenco}/>
-          <label>Género:</label>
-          <br />
-          <input type="text" className='form-control' name="genero" onChange={handleChange}
-            value={filmeSelecionado && filmeSelecionado.genero}/>
-          <br />
-          </div>
+          <select className="form-control" onChange={handleAuxPrecoChange}>
+              <option value="">Escolha uma opção</option>
+              <option value="10.99">10,99 por 1 mês</option>
+              <option value="39.99">39,99 por 6 meses</option>
+              <option value="69.99">69,99 por 12 meses</option>
+          </select>
+      </div>
         </ModalBody>
         <ModalFooter>
           <button className="btn btn-primary" onClick={()=>pedidoPut()}>Editar</button>{"   "}
@@ -271,7 +363,7 @@ useEffect(()=>{
 
       <Modal isOpen={modalExcluir}>
         <ModalBody>
-          Confirma a exclusão deste filme : {filmeSelecionado && filmeSelecionado.titulo} ? 
+          Confirma a exclusão desta Subscrição : {subscricaoSelecionada && subscricaoSelecionada.id} ? 
         </ModalBody>
         <ModalFooter>
           <button className='btn btn-danger' onClick={()=>pedidoDelete()}> Sim </button>
@@ -280,17 +372,17 @@ useEffect(()=>{
       </Modal>
 
       <Modal isOpen={modalCriado}>
-        <ModalHeader>Filme Adicionado</ModalHeader>
+        <ModalHeader>Subscrição Adicionada</ModalHeader>
         <ModalBody>
-          <div>O filme que introduziu foi adicionado com sucesso!</div>
+          <div>A Subscrição que introduziu foi adicionada com sucesso!</div>
         </ModalBody>
         <ModalFooter className="btn btn-primary" onClick={()=>abrirFecharModalCriado()}></ModalFooter>
       </Modal>
 
       <Modal isOpen={modalEditado}>
-        <ModalHeader>Filme Editado</ModalHeader>
+        <ModalHeader>Subscrição Editada</ModalHeader>
         <ModalBody>
-          <div>O filme foi editado com sucesso!</div>
+          <div>A Subscrição foi editado com sucesso!</div>
         </ModalBody>
         <ModalFooter className="btn btn-primary" onClick={()=>abrirFecharModalEditado()}></ModalFooter>
       </Modal>
@@ -299,4 +391,4 @@ useEffect(()=>{
   );
 }
 
-export default App;
+export default Subscricao;
